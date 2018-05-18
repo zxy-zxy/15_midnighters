@@ -7,7 +7,8 @@ from pytz import timezone
 
 
 def get_midnighters(attempt):
-    midnight_hour_limit = 3
+    midnight_hour_limit_begin = 0
+    midnight_hour_limit_end = 3
 
     users = set()
 
@@ -17,7 +18,7 @@ def get_midnighters(attempt):
             tz=timezone(attempt['timezone'])
         )
 
-        if user_time.hour < midnight_hour_limit:
+        if midnight_hour_limit_begin < user_time.hour < midnight_hour_limit_end:
             users.add(attempt['username'])
 
     return users
@@ -36,18 +37,10 @@ def load_attempts():
     current_page_number = 1
 
     while True:
-        try:
-            current_page_response = get_response_from_page(current_page_number)
-        except RequestException:
-            raise StopIteration()
 
-        if current_page_response.get('status_code') != 200:
-            raise StopIteration()
+        current_page_response = get_response_from_page(current_page_number)
 
-        try:
-            page_data = json.loads(current_page_response.get('text'))
-        except JSONDecodeError:
-            raise StopIteration()
+        page_data = json.loads(current_page_response.get('text'))
 
         for record in page_data['records']:
             yield record
