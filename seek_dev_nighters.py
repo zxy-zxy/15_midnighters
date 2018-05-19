@@ -1,14 +1,12 @@
 import requests
-from requests.exceptions import RequestException
 import json
-from json import JSONDecodeError
 from datetime import datetime
 from pytz import timezone
 
 
 def get_midnighters(attempt):
     midnight_hour_limit_begin = 0
-    midnight_hour_limit_end = 3
+    midnight_hour_limit_end = 5
 
     users = set()
 
@@ -27,10 +25,10 @@ def get_midnighters(attempt):
 def get_response_from_page(page_number):
     api_address = 'https://devman.org/api/challenges/solution_attempts'
     response = requests.get(api_address, params={'page': page_number})
-    return {
-        'status_code': response.status_code,
-        'text': response.text
-    }
+    try:
+        return response.json()
+    except ValueError:
+        return None
 
 
 def load_attempts():
@@ -38,15 +36,16 @@ def load_attempts():
 
     while True:
 
-        current_page_response = get_response_from_page(current_page_number)
+        page_data = get_response_from_page(current_page_number)
 
-        page_data = json.loads(current_page_response.get('text'))
+        if page_data is None:
+            break
 
         for record in page_data['records']:
             yield record
 
         if current_page_number == page_data['number_of_pages']:
-            raise StopIteration()
+            break
 
         current_page_number = current_page_number + 1
 
