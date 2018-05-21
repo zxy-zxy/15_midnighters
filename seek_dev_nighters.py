@@ -1,10 +1,9 @@
-import requests
-import json
 from datetime import datetime
+import requests
 from pytz import timezone
 
 
-def get_midnighters(attempt):
+def get_midnighters(attempts):
     midnight_hour_limit_begin = 0
     midnight_hour_limit_end = 5
 
@@ -56,4 +55,4 @@ if __name__ == '__main__':
     midnighters = get_midnighters(attempts)
 
     for _index, midnighter in enumerate(midnighters):
-        print("{}: {}".format(_index, midnighter))
+        print('{}: {}'.format(_index, midnighter))
